@@ -27,5 +27,4 @@ export class Order {
     return Math.min(this.quantity * this.itemPrice * 0.1, 100);
   }
 
-  get
 }
