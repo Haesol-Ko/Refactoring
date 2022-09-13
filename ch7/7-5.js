@@ -1,11 +1,37 @@
+class TelephoneNumber {
+  #areaCode;
+  #number;
+
+  constructor(areaCode, number) {
+    this.#areaCode = areaCode;
+    this.#number = number;
+  }
+  get areaCode() {
+    return this.#areaCode;
+  }
+  set areaCode(arg) {
+    this.#areaCode = arg;
+  }
+
+  get number() {
+    return this.#number;
+  }
+
+  set number(arg) {
+    this.#number = arg;
+  }
+
+  get toString() {
+    return `(${this.areaCode}) ${this.number}`;
+  }
+}
+
 class Person {
   #name;
-  #officeAreaCode;
-  #officeNumber;
+  #telephoneNumber;
   constructor(name, areaCode, number) {
     this.#name = name;
-    this.#officeAreaCode = areaCode;
-    this.#officeNumber = number;
+    this.#telephoneNumber = new TelephoneNumber(areaCode, number);
   }
 
   get name() {
@@ -16,24 +42,20 @@ class Person {
     this.#name = arg;
   }
 
+  /**
+   * person 내부에서 telephoneNumber에 접근해서 값 리턴하기. => getter가 두개
+   * @returns {() => string}
+   */
   get telephoneNumber() {
-    return `(${this.officeAreaCode}) ${this.officeNumber}`;
+    return this.#telephoneNumber.toString;
   }
 
   get officeAreaCode() {
-    return this.#officeAreaCode;
-  }
-
-  set officeAreaCode(arg) {
-    this.#officeAreaCode = arg;
+    return this.#telephoneNumber.areaCode;
   }
 
   get officeNumber() {
-    return this.#officeNumber;
-  }
-
-  set officeNumber(arg) {
-    this.#officeNumber = arg;
+    return this.#telephoneNumber.number;
   }
 }
 
