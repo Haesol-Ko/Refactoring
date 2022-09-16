@@ -1,9 +1,12 @@
+/**
+ * 참조를 값으로 바꾸기
+ */
 class Person {
   #name;
   #telephoneNumber;
   constructor(name, areaCode, number) {
     this.#name = name;
-    this.#telephoneNumber = new TelephoneNumber(areaCode, number);
+    this.#telephoneNumber = new TelephoneNumber(areaCode, number); // telephoneNumber => object => mutable
   }
 
   get name() {
@@ -23,7 +26,8 @@ class Person {
   }
 
   set officeAreaCode(value) {
-    this.#telephoneNumber.areaCode = value;
+    // this.#telephoneNumber.areaCode = value; 참조값을 이용해 areaCode 바꾸는중
+    this.#telephoneNumber = new TelephoneNumber(value, this.officeNumber);
   }
 
   get officeNumber() {
@@ -31,7 +35,7 @@ class Person {
   }
 
   set officeNumber(value) {
-    this.#telephoneNumber.number = value;
+    this.#telephoneNumber.number = new TelephoneNumber(this.officeAreaCode, value);
   }
 }
 

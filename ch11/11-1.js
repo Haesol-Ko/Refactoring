@@ -1,6 +1,6 @@
 // 예제 1
 function totalOutstandingAndSendBill() {
-  const result = customer.invoices.reduce(
+  const result = customerRepository.invoices.reduce(
     (total, each) => each.amount + total,
     0
   );
