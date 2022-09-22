@@ -1,19 +1,21 @@
+/**
+ * 플래그 인수 제거하기
+ */
+
 // 예제 1
-function setDimension(name, value) {
-  if (name === 'height') {
-    this._height = value;
-    return;
-  }
-  if (name === 'width') {
-    this._width = value;
-    return;
-  }
+function setHeight(value) {
+  this._height = value;
+}
+function setWidth(value) {
+  this._width = value;
 }
 
 // 예제 2
 class Concert {
-  book(customer, isPremium) {}
+  premiumBook(customer) {}
+  regularBook(customer) {}
 }
 
 // 예제 3
-function setSwitch(on);
+function switchOn(){}
+function switchOff(){}

@@ -1,22 +1,26 @@
+/**
+ * 질의 함수와 변경 함수 분리하기
+ */
 // 예제 1
-function totalOutstandingAndSendBill() {
-  const result = customerRepository.invoices.reduce(
+function getTotalOutstanding() {
+  return customerRepository.invoices.reduce(
     (total, each) => each.amount + total,
     0
   );
-  sendBill();
-  return result;
 }
 
 // 예제 2
 export function alertForMiscreant(people, alarm) {
+  const miscreant = findMiscreant(people);
+  setOffAlarms(alarm, miscreant);
+}
+
+function findMiscreant(people) {
   for (const p of people) {
     if (p === 'Don') {
-      setOffAlarms(alarm, p);
       return 'Don';
     }
     if (p === 'John') {
-      setOffAlarms(alarm, p);
       return 'John';
     }
   }
