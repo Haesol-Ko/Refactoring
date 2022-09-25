@@ -1,23 +1,27 @@
-class Party {}
+/**
+ * 생성자 본문 올리기
+ */
+class Party {
+  #name;
+constructor(name) {
+  this.#name = name;
+}
+}
 
 class Employee extends Party {
-  #name;
   #id;
   #monthlyCost;
   constructor(name, id, monthlyCost) {
-    super();
-    this.#name = name;
+    super(name);
     this.#id = id;
     this.#monthlyCost = monthlyCost;
   }
 }
 
 class Department extends Party {
-  #name;
   #staff;
   constructor(name, staff) {
-    super();
-    this.#name = name;
+    super(name);
     this.#staff = staff;
   }
 }

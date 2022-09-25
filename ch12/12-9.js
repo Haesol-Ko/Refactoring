@@ -1,3 +1,4 @@
+/**
+ * 계층합치기
+ */
 class Employee {}
-
-class Salesperson extends Employee {}

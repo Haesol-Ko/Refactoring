@@ -1,6 +1,11 @@
+/**
+ * 메서드 내리기
+ */
 class Employee {
-  get quota() {}
 }
 
 class Engineer extends Employee {}
-class Salesperson extends Employee {}
+class Salesperson extends Employee {
+  get quota() {}
+
+}
