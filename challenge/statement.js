@@ -1,3 +1,6 @@
+/**
+ * low-level -> high-level refactoring
+ */
 export function statement(invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
