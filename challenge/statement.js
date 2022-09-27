@@ -1,71 +1,87 @@
 /**
- * low-level -> high-level refactoring
+ * 데이터와 로직 분리하기
+ * 출력하는 데 필요한 데이터를 출력하는 곳에서 계산하고 호출해서 일일이 계산하지 않도록
+ * 출력을 위한 모든 데이터가 들어있는 객체 statement
+ * performance 내부에서도 계산이 필요하므로 미리 계산한 새로운 객체를 만듦
+ * 기존의 performance 객체를 필요한 데이터를 더 넣어서 풍부한 performance 객체를 만들어주고 있음.
+ *
  */
 export function statement(invoice, plays) {
-  return renderPlainText(invoice, plays);
-}
+  const statement = {};
+  statement.customer = invoice.customer;
+  statement.performances = invoice.performances.map(enrichPerformance); // 전달하는 인자와 호출하는 변수가 같다면 생략 가능.. (p=>enrich(p)) === (enrich)
+  statement.totalAmount = totalAmount(statement.performances);
+  statement.totalCredits = totalCredits(statement.performances);
+  return renderPlainText(statement, plays);
 
-function renderPlainText(invoice, plays) {
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`;
+  function enrichPerformance(performance){
+    const result = {...performance};
+    result.play = playFor(performance);
+    result.amount = amountFor(result);
+    result.credit = creditsFor(result);
+    return result;
 
-  for (let perf of invoice.performances) {
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf) / 100)} (${
-        perf.audience
-    }석)\n`;
-  }
+    function playFor(performance) {
+      return plays[performance.playID];
+    }
 
-  result += `총액: ${usd(totalAmount() / 100)}\n`;
-  result += `적립 포인트: ${totalCredits()}점\n`;
-  return result;
-
-  // 질의 함수로 만들기
-  function playFor(performance) {
-    return plays[performance.playID];
+    function amountFor(performance) {
+      let result = 0;
+      switch (performance.play.type) {
+        case 'tragedy': // 비극
+          result = 40000;
+          if (performance.audience > 30) {
+            result += 1000 * (performance.audience - 30);
+          }
+          break;
+        case 'comedy': // 희극
+          result = 30000;
+          if (performance.audience > 20) {
+            result += 10000 + 500 * (performance.audience - 20);
+          }
+          result += 300 * performance.audience;
+          break;
+        default:
+          throw new Error(`알 수 없는 장르: ${performance.play.type}`);
+      }
+      return result;
+    }
   }
 
   function creditsFor(performance) {
     let result = 0;
     result = Math.max(performance.audience - 30, 0);
     // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ('comedy' === playFor(performance).type) {
+    if ('comedy' === performance.play.type) {
       result += Math.floor(performance.audience / 5);
     }
     return result;
   }
-
-  function amountFor(performance) {
-    let result = 0;
-    switch (playFor(performance).type) {
-      case 'tragedy': // 비극
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
-        }
-        break;
-      case 'comedy': // 희극
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
-        }
-        result += 300 * performance.audience;
-        break;
-      default:
-        throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
-    }
-    return result;
-  }
-
-  function totalCredits() {
-    return invoice.performances.reduce(
-        (sum, p) => (sum += creditsFor(p))
+  function totalCredits(performances) {
+    return performances.reduce(
+        (sum, p) => (sum += p.credit)
         , 0);
   }
 
-  function totalAmount() {
-    return invoice.performances.reduce(
-        (sum, p) => (sum += amountFor(p))
+  function totalAmount(performances) {
+    return performances.reduce(
+        (sum, p) => (sum += p.amount)
         , 0);
   }
+}
+
+function renderPlainText(statement, plays) {
+  let result = `청구 내역 (고객명: ${statement.customer})\n`;
+
+  for (let perf of statement.performances) {
+    result += `  ${perf.play.name}: ${usd(perf.amount / 100)} (${
+        perf.audience
+    }석)\n`;
+  }
+
+  result += `총액: ${usd(statement.totalAmount / 100)}\n`;
+  result += `적립 포인트: ${statement.totalCredits}점\n`;
+  return result;
 }
 
 // 유틸리티 같은 애들은 함수의 응집도를 높이지 않으므로 외부로 추출하는 것이 낫다.

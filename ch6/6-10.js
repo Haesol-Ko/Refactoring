@@ -1,3 +1,6 @@
+/**
+ * 여러 함수를 변환 함수로 묶기
+ */
 import _ from 'lodash';
 const reading = { customer: 'ivan', quantity: 10, month: 5, year: 2017 };
 
