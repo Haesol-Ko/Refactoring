@@ -4,73 +4,33 @@
  * 출력을 위한 모든 데이터가 들어있는 객체 statement
  * performance 내부에서도 계산이 필요하므로 미리 계산한 새로운 객체를 만듦
  * 기존의 performance 객체를 필요한 데이터를 더 넣어서 풍부한 performance 객체를 만들어주고 있음.
- *
  */
+import {createStatement} from "./create_statement.js";
+
 export function statement(invoice, plays) {
-  const statement = {};
-  statement.customer = invoice.customer;
-  statement.performances = invoice.performances.map(enrichPerformance); // 전달하는 인자와 호출하는 변수가 같다면 생략 가능.. (p=>enrich(p)) === (enrich)
-  statement.totalAmount = totalAmount(statement.performances);
-  statement.totalCredits = totalCredits(statement.performances);
-  return renderPlainText(statement, plays);
-
-  function enrichPerformance(performance){
-    const result = {...performance};
-    result.play = playFor(performance);
-    result.amount = amountFor(result);
-    result.credit = creditsFor(result);
-    return result;
-
-    function playFor(performance) {
-      return plays[performance.playID];
-    }
-
-    function amountFor(performance) {
-      let result = 0;
-      switch (performance.play.type) {
-        case 'tragedy': // 비극
-          result = 40000;
-          if (performance.audience > 30) {
-            result += 1000 * (performance.audience - 30);
-          }
-          break;
-        case 'comedy': // 희극
-          result = 30000;
-          if (performance.audience > 20) {
-            result += 10000 + 500 * (performance.audience - 20);
-          }
-          result += 300 * performance.audience;
-          break;
-        default:
-          throw new Error(`알 수 없는 장르: ${performance.play.type}`);
-      }
-      return result;
-    }
-  }
-
-  function creditsFor(performance) {
-    let result = 0;
-    result = Math.max(performance.audience - 30, 0);
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ('comedy' === performance.play.type) {
-      result += Math.floor(performance.audience / 5);
-    }
-    return result;
-  }
-  function totalCredits(performances) {
-    return performances.reduce(
-        (sum, p) => (sum += p.credit)
-        , 0);
-  }
-
-  function totalAmount(performances) {
-    return performances.reduce(
-        (sum, p) => (sum += p.amount)
-        , 0);
-  }
+  return renderPlainText(createStatement(invoice, plays));
 }
 
-function renderPlainText(statement, plays) {
+export function htmlStatement(invoice, plays) {
+  return renderHTML(createStatement(invoice, plays));
+}
+
+function renderHTML(statement) {
+  let result = `<h1>청구 내역 (고객명: ${statement.customer})</h1>\n`;
+  result += '<table>\n'
+  result += '<tr><th>play</th><th>석</th><th>cost</th></tr>'
+
+  for (let perf of statement.performances) {
+    result += `  <tr><td>${perf.play.name}</td><td>${perf.audience}</td>`;
+    result += `<td>${usd(perf.amount / 100)}</td></tr>\n`;
+  }
+  result += '</table>\n';
+  result += `<p>총액: <em>${usd(statement.totalAmount / 100)}</em></p>\n`;
+  result += `<p>적립 포인트: <em>${statement.totalCredits}</em>점</p>\n`;
+  return result;
+}
+
+function renderPlainText(statement) {
   let result = `청구 내역 (고객명: ${statement.customer})\n`;
 
   for (let perf of statement.performances) {
