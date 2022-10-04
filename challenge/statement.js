@@ -5,7 +5,7 @@
  * performance 내부에서도 계산이 필요하므로 미리 계산한 새로운 객체를 만듦
  * 기존의 performance 객체를 필요한 데이터를 더 넣어서 풍부한 performance 객체를 만들어주고 있음.
  */
-import {createStatement} from "./create_statement.js";
+import { createStatement } from "./create_statement.js";
 
 export function statement(invoice, plays) {
   return renderPlainText(createStatement(invoice, plays));

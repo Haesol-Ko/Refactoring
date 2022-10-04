@@ -56,23 +56,34 @@ class Comedy extends Performance {
     }
 }
 
-export function createStatement(invoice, plays) {
-    const statement = {};
-    statement.customer = invoice.customer;
-    statement.performances = invoice.performances.map(p => Performance.create(p.audience, plays[p.playID])); // 전달하는 인자와 호출하는 변수가 같다면 생략 가능.. (p=>enrich(p)) === (enrich)
-    statement.totalAmount = totalAmount(statement.performances);
-    statement.totalCredits = totalCredits(statement.performances);
-    return statement;
+export class Statement {
+    #customer;
+    #performances;
+    constructor(invoice, plays) {
+        this.#customer = invoice.customer;
+        this.#performances = invoice.performances.map(p => Performance.create(p.audience, plays[p.playID]));
+    }
+    get customer() {
+        return this.#customer;
+    }
 
-    function totalCredits(performances) {
-        return performances.reduce(
+    get performances() {
+        return [...this.#performances];
+    }
+
+    get totalCredits() {
+        return this.#performances.reduce(
             (sum, p) => (sum += p.credit)
             , 0);
     }
 
-    function totalAmount(performances) {
-        return performances.reduce(
+    get totalAmount() {
+        return this.#performances.reduce(
             (sum, p) => (sum += p.amount)
             , 0);
     }
+}
+
+export function createStatement(invoice, plays) {
+    return new Statement(invoice, plays);
 }
